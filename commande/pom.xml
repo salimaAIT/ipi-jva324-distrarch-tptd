@@ -116,6 +116,12 @@
 						<configuration>
 							<nodeVersion>v10.16.0</nodeVersion>
 							<npmVersion>6.9.0</npmVersion>
+							<!-- optional: where to download node from. Defaults to https://nodejs.org/dist/
+							now redirects to .com anyway -->
+							<nodeDownloadRoot>http://nodejs.org/dist/</nodeDownloadRoot>
+							<!-- optional: where to download npm from. Defaults to https://registry.npmjs.org/npm/-/
+							now redirects to .com anyway -->
+							<npmDownloadRoot>http://registry.npmjs.com/npm/-/</npmDownloadRoot>
 						</configuration>
 					</execution>
 					<!-- Install all project dependencies -->

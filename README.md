@@ -27,13 +27,28 @@ Le but des exercices (TD en séance et TP évalués) est de faire évoluer cette
             - erreur ne trouve pas le symbol "java" : clic droit sur pom.xml > Build > sur Setup DSK choisir Configure > choisir Download et install
             - "Error running..." : Project JDK is not specified > Configure... > no SDK > Add SDK > Download
         - lancer un build maven complet : Run > Edit configurations > Maven > Create configuration > mettre Working directory au dossier du projet et dans Command line, écrire : clean install
-        - problème de sécurisation de connexion :
-          (Maven error : unable to find valid certification path to requested targetmaven unable to find valid certification path to requested target
-          ou
-          unable to access 'https://github.com/mdutoo/ipi-jva350-tptd.git/': SSL certificate problem: unable to get local issuer certificate)
+        - problème de sécurisation de connexion car proxy :
+          - unable to access 'https://github.com/mdutoo/ipi-jva350-tptd.git/': SSL certificate problem: unable to get local issuer certificate
+           Dans C:\Program Files\Git\etc\gitconfig, passer sous [http] la valeur sslBackend à schannel (et non openssl), comme dit à TODO
+          - Maven error : unable to find valid certification path to requested target
           mvn clean package -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
           ou dans IntelliJ Run > Edit Configurations > Java Options (sans -D) : maven.wagon.http.ssl.insecure=true maven.wagon.http.ssl.allowall=true
           comme dit à https://stackoverflow.com/questions/45612814/maven-error-pkix-path-building-failed-unable-to-find-valid-certification-path
+          - unable to find valid certification path to requested target
+          Aller sur les sites nodejs.org, (npmjs. ?) et registry.npmjs.com et télécharger leurs certificats (chaînes .pem) puis importer chacune dans le cacert de votre jdk (et non jre !) :
+          "C:\Users\your_user\.jdks\temurin-20.0.1\bin\keytool" -import -v -trustcacerts -alias nodejs -file "C:\Users\your_user\dev\nodejs-org-chain.pem" -keystore "C:\Users\your_user\.jdks\temurin-20.0.1\lib\security\cacerts" -keypass changeit -storepass changeit
+          "C:\Users\your_user\.jdks\temurin-20.0.1\bin\keytool" -import -v -trustcacerts -alias npmjs -file "C:\Users\your_user\dev\npmjs-com-chain.pem" -keystore "C:\Users\your_user\.jdks\temurin-20.0.1\lib\security\cacerts" -keypass changeit -storepass changeit
+          "C:\Users\your_user\.jdks\temurin-20.0.1\bin\keytool" -import -v -trustcacerts -alias registry-npmjs -file "C:\Users\your_user\dev\registry-npmjs-com-chain.pem" -keystore "C:\Users\your_user\.jdks\temurin-20.0.1\lib\security\cacerts" -keypass changeit -storepass changeit
+          ET rajouter les propriétés maven -Djavax.net.ssl.trustStore="C:\Users\your_user\.jdks\temurin-20.0.1\lib\security\cacerts" -Djavax.net.ssl.trustStorePassword=changeit (ou dans IntelliJ Run > Edit Configurations > Java Options, mais là aussi sans -D)
+          comme dit à https://stackoverflow.com/questions/54515921/cannot-install-node-through-front-end-maven-plugin-due-to-certificate-error
+          - npm ERR! code UNABLE_TO_VERIFY_LEAF_SIGNATURE
+          export NODE_EXTRA_CA_CERTS="C:\Users\marc.dutoo\dev\registry-npmjs-com-chain.pem"
+          PUIS exécuter maven en ligne de commande au moins la première fois, par exemple avec git bash : MinGW64 (clic droit > git bash dans l'explorateur de fichiers ici)
+          export JAVA_HOME="C:\Users\marc.dutoo\.jdks\temurin-20.0.1"
+          "C:\Users\marc.dutoo\dev\ideaIC-2023.1.win\plugins\maven\lib\maven3\bin\mvn" clean install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Djavax.net.ssl.trustStore="C:\Users\marc.dutoo\dev\ideaIC-2023.1.win\jbr\lib\security\cacerts" -Djavax.net.ssl.trustStorePassword=changeit -e
+          comme dit à https://stackoverflow.com/questions/13913941/how-to-fix-ssl-certificate-error-when-running-npm-on-windows
+          NB. par contre, configurer cafile dans ./npmrc ne marche pas car https obligé depuis October 4, 2021 comme le disent les logs
+
     - sinon Eclipse : voir https://thierry-leriche-dessirier.developpez.com/tutoriels/java/importer-projet-maven-dans-eclipse-5-min/
 - Avoir installé postgresql (ou mysql) : https://www.postgresql.org/download/
 
@@ -108,7 +123,7 @@ TODO NON [TD] (à ne faire que s'il n'existe pas encore) Copiez le module Maven 
 
 [TD] Ecrire un test unitaire de la partie la plus importante de commandeService.createCommande() (TODO validateCommande()) (quelle est-elle ?)
 
-[TD] Rendez flexible l'appel de getProduit() par commandeService.createCommande(), en développant une interface ...commande.service.CommandeProduit avec cette seule méthode et en l'implémentant dans un nouveau composant Spring (annoté @Component) de classe ...commande.service.CommandeProduitLocalImpl qui utilise (injecté à l'aide d'@Autowired) ProduitService. Vérifiez que test et IHM marchent toujours.
+[TD] Rendez flexible l'appel de getProduit() par commandeService.createCommande(), en développant une interface ...commande.service.CommandeProduitService avec cette seule méthode et en l'implémentant dans un nouveau composant Spring (annoté @Component) de classe ...commande.service.CommandeProduitLocalImpl qui utilise (injecté à l'aide d'@Autowired) ProduitService. Vérifiez que test et IHM marchent toujours.
 
 [TD] Communication - APIfication : développez le composant Spring (annoté @Component) ...commande.service.CommandeProduitRESTHALImpl implémentant l'interface CommandeProduit à l'aide de RESTTemplate en de manière à utiliser plutôt l'API Spring Data HAL du microservice "stock" (plutôt que du code de persistence local comme jusqu'alors). Vérifiez que tests et IHM marchent toujours.
 
