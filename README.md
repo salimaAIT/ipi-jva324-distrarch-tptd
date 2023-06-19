@@ -24,8 +24,9 @@ Le but des exercices (TD en séance et TP évalués) est de faire évoluer cette
         - Cloner un projet Github : Git > Clone
         - Configuration d'un projet Maven : clic droit sur pom.xml > Add as Maven project ou bien voir IV-B-2 à https://damienrieu.developpez.com/tutoriel/java/nouveautes-intellij-12/?page=page_1
         - Installation de Java : par exemple
-            - erreur ne trouve pas le symbol "java" : clic droit sur pom.xml > Build > sur Setup DSK choisir Configure > choisir Download et install
+            - erreur ne trouve pas le symbol "java" : clic droit sur pom.xml > Build > sur Setup DSK choisir Configure > choisir Download et install (par exemple de la JDK Eclipse Temurin)
             - "Error running..." : Project JDK is not specified > Configure... > no SDK > Add SDK > Download
+            - erreur "Cannot find JRE" : File > Project Structure (ou clic droit dans l'arborescence sur la racine d'un projet Maven), et de là dans Platform Settings > SDKs faire + > Download JDK (ou bien dans Project Settings > Project faire Add SDK > Download SDK)
         - lancer un build maven complet : Run > Edit configurations > Maven > Create configuration > mettre Working directory au dossier du projet et dans Command line, écrire : clean install
         - problème de sécurisation de connexion car proxy :
           - unable to access 'https://github.com/mdutoo/ipi-jva350-tptd.git/': SSL certificate problem: unable to get local issuer certificate
@@ -39,13 +40,16 @@ Le but des exercices (TD en séance et TP évalués) est de faire évoluer cette
           "C:\Users\your_user\.jdks\temurin-20.0.1\bin\keytool" -import -v -trustcacerts -alias nodejs -file "C:\Users\your_user\dev\nodejs-org-chain.pem" -keystore "C:\Users\your_user\.jdks\temurin-20.0.1\lib\security\cacerts" -keypass changeit -storepass changeit
           "C:\Users\your_user\.jdks\temurin-20.0.1\bin\keytool" -import -v -trustcacerts -alias npmjs -file "C:\Users\your_user\dev\npmjs-com-chain.pem" -keystore "C:\Users\your_user\.jdks\temurin-20.0.1\lib\security\cacerts" -keypass changeit -storepass changeit
           "C:\Users\your_user\.jdks\temurin-20.0.1\bin\keytool" -import -v -trustcacerts -alias registry-npmjs -file "C:\Users\your_user\dev\registry-npmjs-com-chain.pem" -keystore "C:\Users\your_user\.jdks\temurin-20.0.1\lib\security\cacerts" -keypass changeit -storepass changeit
+            "C:\Users\your_user\.jdks\temurin-20.0.1\bin\keytool" -import -v -trustcacerts -alias nodejs -file "C:\Users\your_user\dev\nodejs-org-chain.pem" -keystore "C:\Users\your_user\dev\ideaIC-2023.1.win\jbr\lib\security\cacerts" -keypass changeit -storepass changeit
+            "C:\Users\your_user\.jdks\temurin-20.0.1\bin\keytool" -import -v -trustcacerts -alias npmjs -file "C:\Users\your_user\dev\npmjs-com-chain.pem" -keystore "C:\Users\your_user\dev\ideaIC-2023.1.win\jbr\lib\security\cacerts" -keypass changeit -storepass changeit
+            "C:\Users\your_user\.jdks\temurin-20.0.1\bin\keytool" -import -v -trustcacerts -alias registry-npmjs -file "C:\Users\your_user\dev\registry-npmjs-com-chain.pem" -keystore "C:\Users\your_user\dev\ideaIC-2023.1.win\jbr\lib\security\cacerts" -keypass changeit -storepass changeit
           ET rajouter les propriétés maven -Djavax.net.ssl.trustStore="C:\Users\your_user\.jdks\temurin-20.0.1\lib\security\cacerts" -Djavax.net.ssl.trustStorePassword=changeit (ou dans IntelliJ Run > Edit Configurations > Java Options, mais là aussi sans -D)
           comme dit à https://stackoverflow.com/questions/54515921/cannot-install-node-through-front-end-maven-plugin-due-to-certificate-error
           - npm ERR! code UNABLE_TO_VERIFY_LEAF_SIGNATURE
           export NODE_EXTRA_CA_CERTS="C:\Users\marc.dutoo\dev\registry-npmjs-com-chain.pem"
           PUIS exécuter maven en ligne de commande au moins la première fois, par exemple avec git bash : MinGW64 (clic droit > git bash dans l'explorateur de fichiers ici)
           export JAVA_HOME="C:\Users\marc.dutoo\.jdks\temurin-20.0.1"
-          "C:\Users\marc.dutoo\dev\ideaIC-2023.1.win\plugins\maven\lib\maven3\bin\mvn" clean install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Djavax.net.ssl.trustStore="C:\Users\marc.dutoo\dev\ideaIC-2023.1.win\jbr\lib\security\cacerts" -Djavax.net.ssl.trustStorePassword=changeit -e
+          "C:\Users\marc.dutoo\dev\ideaIC-2023.1.win\plugins\maven\lib\maven3\bin\mvn" clean install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Djavax.net.ssl.trustStore="C:\Users\your_user\.jdks\temurin-20.0.1\lib\security\cacerts" -Djavax.net.ssl.trustStorePassword=changeit -e
           comme dit à https://stackoverflow.com/questions/13913941/how-to-fix-ssl-certificate-error-when-running-npm-on-windows
           NB. par contre, configurer cafile dans ./npmrc ne marche pas car https obligé depuis October 4, 2021 comme le disent les logs
 
@@ -123,17 +127,17 @@ TODO NON [TD] (à ne faire que s'il n'existe pas encore) Copiez le module Maven 
 
 [TD] Ecrire un test unitaire de la partie la plus importante de commandeService.createCommande() (TODO validateCommande()) (quelle est-elle ?)
 
-[TD] Rendez flexible l'appel de getProduit() par commandeService.createCommande(), en développant une interface ...commande.service.CommandeProduitService avec cette seule méthode et en l'implémentant dans un nouveau composant Spring (annoté @Component) de classe ...commande.service.CommandeProduitLocalImpl qui utilise (injecté à l'aide d'@Autowired) ProduitService. Vérifiez que test et IHM marchent toujours.
+[TD] Rendez flexible l'appel de getProduit() par commandeService.createCommande(), en développant une interface ...commande.service.CommandeProduitService avec cette seule méthode et en l'implémentant dans un nouveau composant Spring (annoté @Component) de classe ...commande.service.CommandeProduitServiceLocalImpl qui utilise (injecté à l'aide d'@Autowired) ProduitService. Vérifiez que test et IHM marchent toujours.
 
-[TD] Communication - APIfication : développez le composant Spring (annoté @Component) ...commande.service.CommandeProduitRESTHALImpl implémentant l'interface CommandeProduit à l'aide de RESTTemplate en de manière à utiliser plutôt l'API Spring Data HAL du microservice "stock" (plutôt que du code de persistence local comme jusqu'alors). Vérifiez que tests et IHM marchent toujours.
+[TD] Communication - APIfication : développez le composant Spring (annoté @Component) ...commande.service.CommandeProduitServiceRESTHALImpl implémentant l'interface CommandeProduitService à l'aide de RESTTemplate en de manière à utiliser plutôt l'API Spring Data HAL du microservice "stock" (plutôt que du code de persistence local comme jusqu'alors). Vérifiez que tests et IHM marchent toujours.
 
-[TD] Ecrivez un test d'intégration de CommandeProduitRESTHALImpl.
+[TD] Ecrivez un test d'intégration de CommandeProduitServiceRESTHALImpl.
 
-[TD] Déplacez CommandeProduitLocalImpl dans le dossier de sources "test" (plutôt que "main"). Faites en sortes que son test marche toujours TODO aide : @Import((Test)Configuration).
+[TD] Déplacez CommandeProduitServiceLocalImpl dans le dossier de sources "test" (plutôt que "main"). Faites en sortes que son test marche toujours TODO aide : @Import((Test)Configuration).
 
 [TD] BONUS Ecrivez une version mockée du test existant de commandeService.createCommande().
 
-[TD] Sortez la partie http://hôte:port de l'URL en propriétés de configuration, TODO utilisez-la à la place dans CommandeProduitRESTHALImpl.
+[TD] Sortez la partie http://hôte:port de l'URL en propriétés de configuration, TODO utilisez-la à la place dans CommandeProduitServiceRESTHALImpl.
 
 TODO test d'origine (MDU), RESTisé mocké et d'intégration
 TODO aide HAL
@@ -142,7 +146,7 @@ TODO cours @Conf/App alts dont @Qualified et test ?!
 
 ### Extraction du microservice "stock" - nouveau microservice
 
-[TD Copiez le module Maven d'origine vers un module "stock". Adaptez sa configuration de build (pom.xml) en conséquence, et branchez-la dans le pom. xml racine.
+[TD] Copiez le module Maven d'origine vers un module "stock". Adaptez sa configuration de build (pom.xml) en conséquence, et branchez-la dans le pom. xml racine.
 - Développez dans ce module stock un test unitaire de la SEULE partie stock (dans com.ipi.jva324.stock) qui vérifie un bon usage nominal de manière simple (sans la partie ReceptionDeProduit), vérifiez qu'il marche.
 - Supprimez du module stock tout le code Java de la partie commande, et renommez et déplacez la classe de démarrage Spring Boot en com.ipi.jva324.stock.StockApplication. Vérifiez que le nouveau test unitaire marche toujours.
 - Lancez le microservice Stock ainsi créé à l'aide de cette classe. Dans l'IHM qu'il sert, qu'est-ce qui marche encore et qu'est-ce qui ne marche plus, pourquoi ? Quelle est la solution classique, du point de vue web (C) ? du point de vue micro-services (G) ?
@@ -157,7 +161,7 @@ NB. En temps normal, chaque microservice serait dans son propre repository Githu
 
 TODO cours test API REST locale / fournie
 
-[TD] Développez dans le module commande un composant Spring (annoté @Component) CommandeProduitServiceRESTImpl implémentant l'interface CommandeProduit à l'aide de RESTTemplate appelant cette nouvelle API /api/produits de stock. Ecrivez un test d'intégration de CommandeService.createCommande() qui s'en sert TODO @...
+[TD] Développez dans le module commande un composant Spring (annoté @Component) CommandeProduitServiceRESTImpl implémentant l'interface CommandeProduitService à l'aide de RESTTemplate appelant cette nouvelle API /api/produits de stock. Ecrivez un test d'intégration de CommandeService.createCommande() qui s'en sert TODO @...
 
 ### Discovery
 

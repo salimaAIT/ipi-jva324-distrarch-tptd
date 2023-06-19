@@ -20,7 +20,7 @@ const App = () => {
 			setCommandes(response.entity._embedded.commandes);
 		});
 		*/
-		halRestClient({method: 'GET', path: '/api/commandes'}).done(response => {
+		restClient({method: 'GET', path: '/api/commandes'}).done(response => {
 			setCommandes(response.entity);
 		});
 		halRestClient({method: 'GET', path: '/api/data-rest/produitEnStocks'}).done(response => {
