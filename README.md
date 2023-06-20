@@ -58,6 +58,14 @@ Le but des exercices (TD en séance et TP évalués) est de faire évoluer cette
 
 ## Créer la base de données
 
+### PostgreSQL par image Docker
+
+Pour lancer PostgreSQL dans une image Docker à l'aider du docker-compose.yml fourni :
+
+    docker-compose up -d
+
+NB. il est nécessaire de commenter les services autres que "db" si on souhaite démarrer les différents microservices directement en Java plutôt que dans Docker.
+
 ### PostgreSQL
 
 Créer l'utilisateur "ipi" :
@@ -81,12 +89,9 @@ Vérifier que l'utilisateur créé peut bien se connecter à cette base :
 
 Configurer l'application pour s'en servir : dans ```main/resources/application.properties```, décommenter les lignes sous "postgresql - clean setup".
 
-### Docker :
-
-TODO
-
-
 ## Exécution
+
+### Directement en Java :
 
 lancer la classe com.ipi.jva324.Jva324Application
 - dans l'IDE
@@ -95,6 +100,22 @@ lancer la classe com.ipi.jva324.Jva324Application
 - avec maven (IDE ou ligne de commande) : ```mvn spring-boot:run```
 
 Puis pointer le navigateur web à http://localhost:8080/ .
+
+Une fois d'autres microservices développés dans d'autres sous-modules maven, ils sont à lancer de la même manière.
+
+### En Docker :
+
+Pour faciliter le lancement de l'application initiale, et plus tard des autres microservices une fois ceux-ci développés, un docker-compose la comportant ainsi que sa base de données est fourni.
+Pour s'en servir pour démarrer l'application :
+
+    # build java :
+    mvn -DskipTests clean install
+    # build Docker des images et lancement, puis trace d'exécution :
+    docker-compose up -d --build
+    docker-compose logs -f --tail 500 stock-service
+    # autres commandes utiles : status, ps -a, restart
+    # arrêt ET suppression des conteneurs :
+    docker-compose down
 
 
 ## Développement
@@ -107,8 +128,8 @@ Voici l'organisation du code source de l'application :
 - initialisation des données : dans Commande/StockInitService
 - tests : dans les dossers src/main/test
 - configuration : src/main/resources/application.properties .
-    - une base de données en mémoire (H2) est utilisée par défaut
-    - Utiliser plutôt application-prod.properties (en activant le profile Spring "prod") permet de la faire fonctionner en Docker, même s'il est plus facile dans un premier temps de la faire fonctionner sans, y compris chaque micro-service ceux-ci une fois extraits.
+  - une base de données en mémoire (H2) est utilisée par défaut
+  - Utiliser plutôt application-prod.properties (en activant le profile Spring "prod") permet de la faire fonctionner en Docker, même s'il est plus facile dans un premier temps de la faire fonctionner sans, y compris chaque micro-service ceux-ci une fois extraits.
 
 
 ## Exercices
@@ -123,26 +144,25 @@ Forker ce repository Github dans votre propre compte Github. Après chaque quest
 
 ### Extraction du microservice "stock" - refactoring de l'appel en REST HAL
 
-TODO NON [TD] (à ne faire que s'il n'existe pas encore) Copiez le module Maven d'origine vers 1 module "commande". Adaptez sa configuration de build (pom.xml) en conséquence, et branchez-la dans le pom. xml racine. Vérifiez que tests et IHM fonctionnent toujours pareil. Committez et pushez, et faites-le dans toutes les questions suivantes.
-
-[TD] Ecrire un test unitaire de la partie la plus importante de commandeService.createCommande() (TODO validateCommande()) (quelle est-elle ?)
+[TD] Quelle est la partie la plus importante de commandeService.createCommande() ? En écrire un test unitaire.
 
 [TD] Rendez flexible l'appel de getProduit() par commandeService.createCommande(), en développant une interface ...commande.service.CommandeProduitService avec cette seule méthode et en l'implémentant dans un nouveau composant Spring (annoté @Component) de classe ...commande.service.CommandeProduitServiceLocalImpl qui utilise (injecté à l'aide d'@Autowired) ProduitService. Vérifiez que test et IHM marchent toujours.
 
-[TD] Communication - APIfication : développez le composant Spring (annoté @Component) ...commande.service.CommandeProduitServiceRESTHALImpl implémentant l'interface CommandeProduitService à l'aide de RESTTemplate en de manière à utiliser plutôt l'API Spring Data HAL du microservice "stock" (plutôt que du code de persistence local comme jusqu'alors). Vérifiez que tests et IHM marchent toujours.
+[TD] Communication - exposition des produits en HAL : dans le module commande, activez Spring Data REST sur le chemin /api/data-rest  (voir cours).
 
-[TD] Ecrivez un test d'intégration de CommandeProduitServiceRESTHALImpl.
+[TD] Communication - consommation des produits : développez le composant Spring (annoté @Component) ...commande.service.CommandeProduitServiceRESTHALImpl implémentant l'interface CommandeProduitService à l'aide de RESTTemplate en de manière à utiliser plutôt l'API Spring Data HAL du microservice "stock" (plutôt que du code de persistence local comme jusqu'alors). Vérifiez que tests et IHM marchent toujours.
 
-[TD] Déplacez CommandeProduitServiceLocalImpl dans le dossier de sources "test" (plutôt que "main"). Faites en sortes que son test marche toujours TODO aide : @Import((Test)Configuration).
+[TD] Quel problème apparaît en essayant de le faire marcher (démarrage test ou IHM), pourquoi ? Pour le résoudre, pour l'instant commentez l'annotation en tête de CommandeProduitLocalImpl. Vérifiez que tests et IHM marchent toujours.
+
+[TD] Ecrivez dans une classe CommandeProduitServiceRestHalImplIntegrationTest un test d'intégration de CommandeProduitServiceRESTHALImpl, le plus simple possible (test de son appel distant).
+
+[TD] Déplacez CommandeProduitServiceLocalImpl dans le dossier de sources "test" (plutôt que "main"). Faites en sorte que son test marche toujours. Pour cela, définissez son instanciation (aide: comme celle de RestTemplate, voir le cours...) dans une classe TestLocalConfiguration annotée @Configuration utilisée dans le test en annotant ce dernier @Import(TestLocalConfiguration). TODO cours
 
 [TD] BONUS Ecrivez une version mockée du test existant de commandeService.createCommande().
 
-[TD] Sortez la partie http://hôte:port de l'URL en propriétés de configuration, TODO utilisez-la à la place dans CommandeProduitServiceRESTHALImpl.
+[TD] Sortez la partie http://hôte:port de l'URL en propriété de configuration dans application.properties (injectée dans une variable de classe en l'annotant par @Value("ma.prop:valeurPardéfaut")), utilisez-la à la place dans CommandeProduitRESTHALImpl.
 
-TODO test d'origine (MDU), RESTisé mocké et d'intégration
-TODO aide HAL
-TODO cours RESTTemplate
-TODO cours @Conf/App alts dont @Qualified et test ?!
+[TP] faire pareil que dans CommandeService.createCommande() mais dans CommandeService.validateCommande(), afin de finir de ne plus utiliser ProduitService directement dans CommandeService.
 
 ### Extraction du microservice "stock" - nouveau microservice
 
@@ -153,13 +173,14 @@ TODO cours @Conf/App alts dont @Qualified et test ?!
 
 NB. En temps normal, chaque microservice serait dans son propre repository Github vu qu'il est géré par une équipe de développement différente (à moins d'une politique "monorepo" dans l'entreprise). Tous sont ici dans le même repository (et de builds raccrochés dans un pom.xml racine) uniquement pour simplifier la gestion des exercices.
 
-[TD] Essayez de démarrer les 2 microservices en même temps, que constatez-vous ? Quelle est la cause, le principe de la solution, une solution qui utilise ce qui a été fait plus tôt ? Mettez-là en place. Validez que l'IHM remarche intégralement.
+[TD] Essayez de démarrer les 2 microservices en même temps, que constatez-vous ? Quelle est la cause, le principe de la solution, une solution qui entre autres utilise ce qui a été fait plus tôt ? Mettez-là en place. Validez que l'IHM remarche intégralement.
 
-[TD] Dans StockService, développez (en Spring MVC REST) sous l'URL /api/produits une ProduitAPI permettant de trouver un produit en stock par son id. Testez-là.
+[TP] StockApi :
+ - Sur le modèle de CommandeApi dans le module maven "commande"", développer dans le modèle maven "stock" une StockApi et son traitement d'un GET HTTP renvoyant un ProduitEnStock d'id donné.
+- Ensuite, sur le modèle de CommandeProduitServiceRestHalImpl, développer CommandeProduitServiceRestImpl qui appelle cette nouvelle StockApi et non plus l'API automatiquement exposée au format REST HAL par Spring Data Rest.
+- Faites-en un test d'intégration CommandeProduitServiceRestImplIntegrationTest sur le modèle de celui fait en TD dans CommandeProduitServiceRestHalImplIntegrationTest. Utilisez la même solution (@Import(TestRestConfiguration)) pour le faire marcher en parallèle des autres.
 
-[TD] BONUS si vous êtes en avance, adaptez l'IHM de stock pour qu'elle s'en serve, voire commencez à développer une version Thymeleaf de l'IHM.
-
-TODO cours test API REST locale / fournie
+[TP] BONUS adaptez l'IHM de stock pour qu'elle s'en serve, voire développez le début d'une version Thymeleaf de l'IHM (par exemple une simple liste de produits).
 
 [TD] Développez dans le module commande un composant Spring (annoté @Component) CommandeProduitServiceRESTImpl implémentant l'interface CommandeProduitService à l'aide de RESTTemplate appelant cette nouvelle API /api/produits de stock. Ecrivez un test d'intégration de CommandeService.createCommande() qui s'en sert TODO @...
 
@@ -167,10 +188,13 @@ TODO cours test API REST locale / fournie
 
 [TD] générez la base d'un nouveau microservice Spring Boot à l'aide de start.spring.io (Spring Initializr), avec une configuration similaire à celle du module "commande", mais nommé "discovery" et de dépendances : cloud-eureka-server. Configurez ses propriétés comme pour un DiscoveryService. Démarrez-le en même temps que les précédents microservices et vérifiez que les logs de non-enregistrement de ces derniers disparaissent.
 
-TODO
-use it in RestTemplate : https://spring.io/blog/2015/01/20/microservice-registration-and-discovery-with-spring-cloud-and-netflix-s-eureka
-& scale to demo
+TODO s'assurer qu'il est utilisé dans RestTemplate : https://spring.io/blog/2015/01/20/microservice-registration-and-discovery-with-spring-cloud-and-netflix-s-eureka
+& passage à l'échelle en en instanciant d'autres instances, manuellement et aussi avec docker-compose scale
 
 ### Gateway
 
 [TD] générez la base d'un nouveau microservice Spring Boot à l'aide de start.spring.io (Spring Initializr), avec une configuration similaire à celle du module "commande", mais nommé "gateway" et de dépendances : cloud-eureka,actuator,cloud-gateway,devtools . Configurez ses propriétés pour un déploiement sur un autre port (ex. 8081) et un autre nom pour le discovery service (ex. gateway), ainsi que avec des routes vers l'IHM et l'API /api/commandes du microservice commande et l'API /api/data-rest/produitEnStocks du microservice stock. Browsez sur ce port et vérifiez que l'IHM remarche intégralement. Pourquoi ?
+
+### Actuator et monitoring
+
+TODO
