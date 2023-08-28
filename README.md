@@ -93,6 +93,8 @@ Configurer l'application pour s'en servir : dans ```main/resources/application.p
 
 ### Directement en Java :
 
+D'abord (et après tout changement d'interface utilisateur React.js) lancer une compilation complète : ```mvn clean install-DskipTests```
+
 lancer la classe com.ipi.jva324.Jva324Application
 - dans l'IDE
     - IntelliJ : l'ouvrir et cliquer sur la flèche verte sur sa gauche
@@ -122,7 +124,7 @@ Pour s'en servir pour démarrer l'application :
 
 Voici l'organisation du code source de l'application :
 - code Java de l'application de départ : dans les package com.ipi.jva324.commande/stock(reception)
-- web : Controllers web et API RESST en Spring MVC dans les sous-packages web, SPA React.js dans src/main/resources/js (ou sinon possibilité de mettre des templates Thymeleaf dans main/resources/templates )
+- web : Controllers web et API REST en Spring MVC dans les sous-packages web, SPA React.js dans src/main/resources/js (ou sinon possibilité de mettre des templates Thymeleaf dans main/resources/templates )
 - couche de services métier : dans les sous-packages service
 - persistence : en Spring Data JPA, avec modèles d'entités dans les sous-packages model (également utilisables en couche web), et repository dans les sous-packages éponymes
 - initialisation des données : dans Commande/StockInitService
