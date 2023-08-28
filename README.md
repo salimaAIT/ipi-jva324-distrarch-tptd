@@ -146,6 +146,8 @@ Forker ce repository Github dans votre propre compte Github. Après chaque quest
 
 ### Extraction du microservice "stock" - refactoring de l'appel en REST HAL
 
+TODO NON [TD] (à ne faire que s'il n'existe pas encore) Copiez le module Maven d'origine vers 1 module "commande". Adaptez sa configuration de build (pom.xml) en conséquence, et branchez-la dans le pom. xml racine. Vérifiez que tests et IHM fonctionnent toujours pareil. Committez et pushez, et faites-le dans toutes les questions suivantes.
+
 [TD] Quelle est la partie la plus importante de commandeService.createCommande() ? En écrire un test unitaire.
 
 [TD] Rendez flexible l'appel de getProduit() par commandeService.createCommande(), en développant une interface ...commande.service.CommandeProduitService avec cette seule méthode et en l'implémentant dans un nouveau composant Spring (annoté @Component) de classe ...commande.service.CommandeProduitServiceLocalImpl qui utilise (injecté à l'aide d'@Autowired) ProduitService. Vérifiez que test et IHM marchent toujours.
@@ -162,7 +164,7 @@ Forker ce repository Github dans votre propre compte Github. Après chaque quest
 
 [TD] BONUS Ecrivez une version mockée du test existant de commandeService.createCommande().
 
-[TD] Sortez la partie http://hôte:port de l'URL en propriété de configuration dans application.properties (injectée dans une variable de classe en l'annotant par @Value("ma.prop:valeurPardéfaut")), utilisez-la à la place dans CommandeProduitRESTHALImpl.
+[TD] Sortez la partie http://hôte:port de l'URL en propriétés de configuration, TODO utilisez-la à la place dans CommandeProduitRESTHALImpl.
 
 [TP] faire pareil que dans CommandeService.createCommande() mais dans CommandeService.validateCommande(), afin de finir de ne plus utiliser ProduitService directement dans CommandeService.
 
@@ -182,7 +184,9 @@ NB. En temps normal, chaque microservice serait dans son propre repository Githu
 - Ensuite, sur le modèle de CommandeProduitServiceRestHalImpl, développer CommandeProduitServiceRestImpl qui appelle cette nouvelle StockApi et non plus l'API automatiquement exposée au format REST HAL par Spring Data Rest.
 - Faites-en un test d'intégration CommandeProduitServiceRestImplIntegrationTest sur le modèle de celui fait en TD dans CommandeProduitServiceRestHalImplIntegrationTest. Utilisez la même solution (@Import(TestRestConfiguration)) pour le faire marcher en parallèle des autres.
 
-[TP] BONUS adaptez l'IHM de stock pour qu'elle s'en serve, voire développez le début d'une version Thymeleaf de l'IHM (par exemple une simple liste de produits).
+[TD] BONUS si vous êtes en avance, adaptez l'IHM de stock pour qu'elle s'en serve, voire commencez à développer une version Thymeleaf de l'IHM (par exemple une simple liste de produits).
+
+TODO cours test API REST locale / fournie
 
 [TD] Développez dans le module commande un composant Spring (annoté @Component) CommandeProduitServiceRESTImpl implémentant l'interface CommandeProduitService à l'aide de RESTTemplate appelant cette nouvelle API /api/produits de stock. Ecrivez un test d'intégration de CommandeService.createCommande() qui s'en sert TODO @...
 
