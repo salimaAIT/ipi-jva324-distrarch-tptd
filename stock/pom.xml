@@ -10,10 +10,10 @@
 	</parent>
 
 	<groupId>com.ipi.jva324</groupId>
-	<artifactId>commande</artifactId>
+	<artifactId>stock</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>commande</name>
+	<name>stock</name>
 	<description>TP IPI Architectures distribuées</description>
 
 	<properties>

@@ -77,4 +77,16 @@ public class CommandeTest {
         }
     }
 
+    //Test pour vérifier la création de commande
+    @Test
+    public void testCreerCommande() {
+        //Récupérer le premier produit en stock
+        ProduitEnStock p1 = produitService.getProduits().get(0);
+        Commande c1 = commandeService.createCommande(new Commande(p1.getId(), 1l));
+        Assertions.assertEquals("created", c1.getStatus());
+        Assertions.assertEquals(p1.getQuantiteDisponible(),
+                c1.getQuantiteDisponibleStockConnu());
+    }
+
+
 }

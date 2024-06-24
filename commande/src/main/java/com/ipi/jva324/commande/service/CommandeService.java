@@ -31,6 +31,9 @@ public class CommandeService {
     @Autowired
     private ProduitService produitService;
 
+    @Autowired
+    private CommandeProduitService commandeProduitService;
+
     /**
      * TODO better
      * récupère le port après l'initialisation de Spring (car avant est impossible)
@@ -57,7 +60,7 @@ public class CommandeService {
 
         // TODO get quantiteStockConnu, d'abord par RestTemplate
         logger.debug("createCommande produitId=" + commande.getProduitId());
-        ProduitEnStock produitEnStockFound = produitService.getProduit(commande.getProduitId());
+        ProduitEnStock produitEnStockFound = commandeProduitService.getProduit(commande.getProduitId());
         long quantiteDisponible = (produitEnStockFound == null) ? 0 : produitEnStockFound.getQuantiteDisponible();
         commande.setQuantiteDisponibleStockConnu(quantiteDisponible);
 
